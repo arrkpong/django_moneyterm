@@ -119,7 +119,7 @@ http {
 
     server {
         listen 80;
-        server_name 13.115.12.144;  # Replace this with your domain or public IP
+        server_name 00.00.00.00;  # Replace this with your domain or public IP
 
         location / {
             proxy_pass http://django;
