@@ -1,0 +1,73 @@
+<!-- support_app\templates\ticket_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+    <title>Ticket List</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">
+        <i class="fas fa-list"></i> Ticket List
+    </h1>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if tickets %}
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">
+                    <i class="fas fa-id-card"></i> ID
+                </th>
+                <th scope="col">
+                    <i class="fas fa-comment-alt"></i> Subject
+                </th>
+                <th scope="col">
+                    <i class="fas fa-user"></i> Customer
+                </th>
+                <th scope="col">
+                    <i class="fas fa-cog"></i> Status
+                </th>
+                <th scope="col">
+                    <i class="fas fa-tools"></i> Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.subject }}</td>
+                <td>{{ ticket.customer }}</td>
+                <td>{{ ticket.status }}</td>
+                <td>
+                    <form action="{% url 'close_ticket' ticket.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-times"></i> Close Ticket
+                        </button>
+                    </form>
+                    <a href="{% url 'ticket_responses' ticket.id %}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> View Detail
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="mt-4 text-info">
+        <i class="fas fa-info-circle"></i> There are no tickets available.
+    </p>
+    {% endif %}
+
+</div>
+{% endblock %}
+

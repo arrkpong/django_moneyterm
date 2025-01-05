@@ -1,0 +1,66 @@
+<!-- support_app\templates\ticket_responses.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+    <title>Ticket responses</title>
+{% endblock %}
+
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h2><i class="fas fa-ticket-alt"></i> Ticket responses</h2>
+    </div>
+    <div class="card-body">
+        <h5><i class="fas fa-comment-alt"></i> Subject: {{ ticket.subject }}</h5>
+        <p><i class="fas fa-comment-alt"></i> Message: {{ ticket.message }}</p>
+        {% if ticket.image %}
+        <p><i class="fas fa-image"></i> <img src="{{ ticket.image.url }}" alt="Ticket Image" class="img-fluid"></p>
+        {% endif %}
+        
+        <h3><i class="fas fa-comments"></i> Responses</h3>        
+        <ul class="list-group">
+            {% for response in responses %}
+            <li class="list-group-item">
+                <p><i class="fas fa-comment-alt"></i> {{ response.message }}</p>
+                {% if response.image %}
+                <p><i class="fas fa-image"></i> <img src="{{ response.image.url }}" alt="Response Image" class="img-fluid"></p>
+                {% endif %}
+                <p><i class="fas fa-user"></i> By {{ response.responder.username }} on {{ response.created_at|date:"d/m/Y H:i" }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+
+        {% if not ticket.status == 'Closed' %}
+        <form method="post" enctype="multipart/form-data" class="mt-4">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="message" class="form-label"><i class="fas fa-comment-alt"></i> Message</label>
+                <textarea id="message" name="message" class="form-control" placeholder="Enter your response" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="image" class="form-label"><i class="fas fa-image"></i> Image</label>
+                <input type="file" id="image" name="image" class="form-control-file" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-arrow-alt-circle-up"></i> Submit</button>
+        </form>
+        {% endif %}
+        
+        {% if user.is_superuser or user.is_staff %}
+        <form method="post" action="{% url 'close_ticket' ticket.id %}" class="mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger"><i class="fas fa-times-circle"></i> Close ticket</button>
+        </form>
+        {% endif %}
+        
+        {% if messages %}
+        <div class="mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

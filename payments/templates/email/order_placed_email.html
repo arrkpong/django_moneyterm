@@ -1,0 +1,86 @@
+<!-- email/order_placed_email.html -->
+{% load humanize %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Placed</title>
+     <!-- Bootstrap CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+     <!-- Bootstrap Icons -->
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            color: #0d6efd;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: .25rem;
+        }
+
+        strong {
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="bi bi-box-seam"></i> Your Order Details</h1>
+        <p>Thank you for your order! Here are the details:</p>
+        <p><i class="bi bi-box"></i> Order ID: {{ order.id }}</p>
+        <p><i class="bi bi-cash"></i> Total Price: {{ order.total_price|intcomma }} THB</p>
+        <h2><i class="bi bi-list-check"></i> Order Items:</h2>
+        <ul>
+            {% for item in order.orderitem_set.all %}
+            <li>
+                <i class="bi bi-card-list"></i> <strong>Name:</strong> {{ item.card }}<br>
+                <i class="bi bi-currency-dollar"></i> <strong>Price:</strong> {{ item.price|intcomma }} THB<br>
+                <i class="bi bi-barcode"></i> <strong>Serial Number:</strong> {{ item.serial_number }}<br>
+                <i class="bi bi-key"></i> <strong>PIN:</strong> {{ item.pin }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="footer">
+        <span>&copy; Money Term 2024 Company, Inc.</span>
+    </div>
+</body>
+</html>

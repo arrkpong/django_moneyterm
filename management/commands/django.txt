@@ -1,0 +1,126 @@
+นี่คือ Cheat Sheet ของคำสั่งทั่วไปใน Django:
+
+การติดตั้งและการตั้งค่า
+ติดตั้ง Django
+pip install django
+
+สร้างโปรเจกต์ Django ใหม่
+django-admin startproject projectname
+
+เริ่มเซิร์ฟเวอร์
+python manage.py runserver
+
+สร้างแอปพลิเคชันใหม่ในโปรเจกต์
+python manage.py startapp appname
+
+คำสั่ง manage.py ที่ใช้บ่อย
+สร้าง Migration
+python manage.py makemigrations
+
+ปรับใช้ Migration
+python manage.py migrate
+
+สร้าง Superuser
+python manage.py createsuperuser
+
+เช็คความผิดพลาดของโค้ด
+python manage.py check
+
+รีเซ็ตฐานข้อมูล (ใช้ด้วยความระมัดระวัง)
+python manage.py flush
+
+โครงสร้างโปรเจกต์
+
+projectname/
+│
+├── manage.py         # สคริปต์คำสั่งสำหรับการจัดการโปรเจกต์
+├── projectname/      # โฟลเดอร์ของโปรเจกต์
+│   ├── __init__.py
+│   ├── settings.py   # การตั้งค่าต่างๆ ของโปรเจกต์
+│   ├── urls.py       # การกำหนด URL ของโปรเจกต์
+│   ├── wsgi.py       # การตั้งค่าสำหรับ WSGI server
+│   └── asgi.py       # การตั้งค่าสำหรับ ASGI server
+└── appname/          # โฟลเดอร์ของแอป
+    ├── __init__.py
+    ├── admin.py      # การตั้งค่าใน Django admin
+    ├── apps.py       # การตั้งค่าแอป
+    ├── models.py     # โมเดลของแอป
+    ├── tests.py      # การทดสอบของแอป
+    ├── views.py      # วิวของแอป
+    ├── migrations/   # โฟลเดอร์สำหรับเก็บ Migration
+    └── templates/    # โฟลเดอร์สำหรับเทมเพลต (HTML files)
+
+การตั้งค่าใน settings.py
+เพิ่มแอปใน INSTALLED_APPS
+
+INSTALLED_APPS = [
+    ...,
+    'appname',
+]
+
+การตั้งค่าฐานข้อมูล
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',  # หรือ 'django.db.backends.postgresql' ฯลฯ
+        'NAME': BASE_DIR / "db.sqlite3",  # หรือชื่อฐานข้อมูลอื่นๆ
+    }
+}
+
+การกำหนด URL
+urls.py ของโปรเจกต์
+
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('appname/', include('appname.urls')),
+]
+
+urls.py ของแอป
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.index, name='index'),
+]
+
+การสร้าง View
+views.py
+
+from django.shortcuts import render
+
+def index(request):
+    return render(request, 'appname/index.html')
+
+การสร้าง Model
+models.py
+
+from django.db import models
+
+class ExampleModel(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+
+การสร้าง Template
+index.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Index Page</title>
+</head>
+<body>
+    <h1>Welcome to the Index Page</h1>
+</body>
+</html>
+
+การใช้งาน Admin Interface
+admin.py
+
+from django.contrib import admin
+from .models import ExampleModel
+
+admin.site.register(ExampleModel)

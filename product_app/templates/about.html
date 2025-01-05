@@ -1,0 +1,24 @@
+<!-- product_app\templates\about.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  <title>About</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/about/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container about-page">
+  <h1 class="mb-3">
+    <i class="fas fa-users"></i> About Us
+  </h1>
+  <p class="lead">This is a Moneyterm project developed by computer science students from Bangkok University School of Information Technology and Innovation. The project, which serves as the culmination of our studies in computer science, aims to develop skills and learn web development techniques. We utilized Django Framework, HTML5, CSS3, SQLite3, and Bootstrap 5, along with integrating Stripe for payment processing, for this project.</p>
+  <p class="lead">Throughout the development process, students from various disciplines within computer science collaborated to bring this project to fruition, utilizing their skills in web development technologies.</p>
+  <p class="lead">The significance of this project lies in developing a real-world usable website. The need for improvement in our project lies in CSS, as the students did not have direct experience with web design, hindering our ability to effectively style the website.</p>
+  <p class="lead">Overall, our project offers a comprehensive solution to web development. We hope that it not only showcases our technical proficiency but also demonstrates our ability to tackle real-world challenges.</p>
+  <p class="lead">For more information or inquiries about our project, feel free to contact us <a href="mailto:arrkpong1@gmail.com" class="link-primary">arrkpong1@gmail.com <i class="fas fa-envelope"></i></a>, <a href="mailto:owen111244@gmail.com" class="link-primary">owen111244@gmail.com <i class="fas fa-envelope"></i></a>. Thank you for visiting our page and showing your support for the endeavors of computer science students at Bangkok University.</p>
+</div>
+{% endblock %}

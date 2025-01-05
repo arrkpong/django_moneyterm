@@ -1,0 +1,46 @@
+<!--user_app\templates\login.html-->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>Login</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/login/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      <h1 class="text-center">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </h1>
+      {% if messages %}
+      <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+      </div>
+      {% endif %}
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username"><i class="fas fa-user"></i> Username:</label>
+          <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+          <label for="password"><i class="fas fa-lock"></i> Password:</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary my-3 btn-block"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <a href="{% url 'register' %}" class="btn btn-link"><i class="fas fa-user-plus"></i> Register</a>
+      </form>
+      <div class="text-center mt-3">
+        <a href="{% url 'password_reset' %}" class="btn btn-link"><i class="fas fa-question-circle"></i> Forgot Password? Reset Password</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

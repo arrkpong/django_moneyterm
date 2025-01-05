@@ -1,0 +1,67 @@
+<!-- product_app/templates/index.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  <title>Popular Products</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/index/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Carousel Section -->
+    <div id="carouselExampleIndicators" class="carousel slide mb-4" data-bs-ride="carousel">
+        <ol class="carousel-indicators">
+            {% for ad in carousel_ads %}
+                <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
+            {% endfor %}
+        </ol>
+        <div class="carousel-inner">
+            {% for ad in carousel_ads %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ ad.image.url }}" class="d-block w-100" alt="Advertisement" loading="eager" width="auto" height="auto">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>{{ ad.description }}</h5>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>        
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    
+
+    <!-- Popular Products Section -->
+    <h1 class="mb-4">
+        <i class="fas fa-star text-warning"></i> Popular Products
+    </h1>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for card_type in popular_card_types %}
+            <div class="col-6 col-md-4 col-lg-3 mb-4">
+                <div class="card">
+                    <img src="{{ card_type.image.url }}" class="card-img-top img-fluid" alt="{{ card_type.card_type }}" width="auto" height="auto">
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ card_type.card_name }}</h5>
+                        <p class="card-text">{{ card_type.description }}</p>
+                        <a href="{% url 'product_detail' card_name_id=card_type.pk %}" class="btn btn-primary">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

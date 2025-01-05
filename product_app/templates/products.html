@@ -1,0 +1,62 @@
+<!-- product_app/templates/products.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  <title>Products</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/products/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+  <h1 class="mb-3">
+    <i class="fas fa-box-open"></i> All Products
+  </h1>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for card_type in card_types %}
+      <div class="col-6 col-md-4 col-lg-3 mb-4">
+        <div class="card">
+          {% if card_type.image %}
+            <img src="{{ card_type.image.url }}" class="card-img-top img-fluid" alt="{{ card_type.card_name }}" width="auto" height="auto">
+          {% else %}
+            <div class="card-img-placeholder">
+              <p>No Image Available</p>
+            </div>
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ card_type.card_name }}</h5>
+            <p class="card-text">{{ card_type.description }}</p>
+            <a href="{% url 'product_detail' card_name_id=card_type.pk %}" class="btn btn-primary">
+              <i class="fas fa-eye"></i> View Details
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  
+  <!-- Pagination -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if card_types.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ card_types.previous_page_number }}"><i class="fas fa-arrow-left"></i> Previous</a>
+        </li>
+      {% endif %}
+      {% for i in card_types.paginator.page_range %}
+        <li class="page-item {% if card_types.number == i %}active{% endif %}">
+          <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+      {% endfor %}
+      {% if card_types.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ card_types.next_page_number }}">Next <i class="fas fa-arrow-right"></i></a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endblock %}

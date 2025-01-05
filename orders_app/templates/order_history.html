@@ -1,0 +1,79 @@
+<!-- orders_app/templates/order_history.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+  <title>Order History</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/order_history/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">
+    <i class="fas fa-history"></i> Order History
+  </h1>
+  {% if orders %}
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col"><i class="fas fa-calendar-alt"></i> Order Date</th>
+            <th scope="col"><i class="fas fa-coins"></i> Total Price</th>
+            <th scope="col"><i class="fas fa-check-circle"></i> Status</th>
+            <th scope="col"><i class="fas fa-credit-card"></i> Card Details</th>
+            <th scope="col"><i class="fas fa-list-alt"></i> Serial Number</th>
+            <th scope="col"><i class="fas fa-key"></i> PIN</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr>
+            <td data-label="#"> {{ forloop.counter }}</td>
+            <td data-label="Order Date">{{ order.order_date|date:"d/m/Y H:i:s" }}</td>
+            <td data-label="Total Price">{{ order.total_price|intcomma }} THB</td>
+            <td data-label="Status">{{ order.status }}</td>
+            <td data-label="Card Details">
+              <ul class="card-details-list">
+                {% for order_item in order_items %}
+                  {% if order_item.order == order %}
+                    <li>{{ order_item.card.card_price.card_name }} - {{ order_item.amount }} (Price: {{ order_item.price|intcomma }} THB)</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </td>
+            <td data-label="Serial Number">
+              <ul>
+                {% for order_item in order_items %}
+                  {% if order_item.order == order %}
+                    <li>{{ order_item.serial_number }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </td>
+            <td data-label="PIN">
+              <ul>
+                {% for order_item in order_items %}
+                  {% if order_item.order == order %}
+                    <li>{{ order_item.pin }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info" role="alert">
+      <p>Your order history is empty.</p>
+      <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back to products</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

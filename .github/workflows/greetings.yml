@@ -1,0 +1,26 @@
+# django_moneyterm/.github/workflows/greetings.yml
+name: Greetings
+
+on: 
+  pull_request_target:
+  issues:
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      # Check out the repository (optional but recommended for consistency)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Send greetings to new contributors
+      - name: Send greetings
+        uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: "Thank you for opening your first issue! We will review it as soon as possible."
+          pr-message: "Thank you for submitting your first pull request! We will review it as soon as possible."

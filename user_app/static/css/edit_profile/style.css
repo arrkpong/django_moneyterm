@@ -1,0 +1,32 @@
+/* styles.css */
+
+.user-profile {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .edit-profile-form {
+    margin-top: 20px;
+  }
+  
+  .edit-profile-form .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .edit-profile-form label {
+    font-weight: bold;
+  }
+  
+  .edit-profile-form textarea {
+    height: 100px;
+  }
+  
+  .edit-profile-form input[type="file"] {
+    padding-top: 10px;
+  }
+  
+  .edit-profile-form button[type="submit"] {
+    margin-top: 20px;
+  }
+  

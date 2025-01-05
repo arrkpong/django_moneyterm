@@ -1,0 +1,12 @@
+<!--orders_app\templates\thank_you.html-->
+{% extends 'base.html' %}
+{% block title %}
+    <title>Thank You</title>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="display-4 mt-5"><i class="fas fa-check-circle text-success"></i> Thank You for Your Feedback!</h1>
+    <p class="lead">Your feedback has been successfully submitted.</p>
+    <a href="{% url 'order_history' %}" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back to Order History</a>
+</div>
+{% endblock %}

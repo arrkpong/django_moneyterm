@@ -1,0 +1,30 @@
+# django_moneyterm/.github/workflows/label.yml
+# This workflow will triage pull requests and apply a label based on the
+# paths that are modified in the pull request.
+#
+# To use this workflow, you will need to set up a .github/labeler.yml
+# file with configuration. For more information, see:
+# https://github.com/actions/labeler
+
+name: Labeler
+
+on:
+  pull_request_target:
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      # Check out the repository to access the labeler configuration
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Run the labeler action
+      - name: Apply labels based on changed files
+        uses: actions/labeler@v4
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"

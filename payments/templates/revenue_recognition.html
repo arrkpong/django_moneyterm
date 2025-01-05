@@ -1,0 +1,36 @@
+<!-- payments\templates\revenue_recognition.html -->
+{% extends 'base.html' %}
+{% block title %}
+    <title>Revenue Recognition</title>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">Revenue Recognition</h1>
+    <div class="row mt-4">
+        <div class="col">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"><i class="fas fa-money-bill-wave"></i> Amount</th>
+                        <th scope="col"><i class="fas fa-coins"></i> Currency</th>
+                        <th scope="col"><i class="far fa-calendar-alt"></i> Created</th>
+                        <th scope="col"><i class="far fa-user"></i> Customer</th>
+                        <th scope="col"><i class="far fa-file-alt"></i> Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for charge in charges %}
+                    <tr>
+                        <td>{{ charge.amount }}</td>
+                        <td>{{ charge.currency }}</td>
+                        <td>{{ charge.created }}</td>
+                        <td>{{ charge.customer.email }}</td>
+                        <td>{{ charge.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+<!--user_app\templates\email\notification_email.html-->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification: {{ title }}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .notification-container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0d6efd;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        h2 {
+            color: #343a40;
+            margin-top: 20px; 
+            font-size: 24px;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #212529;
+            margin-bottom: 30px;
+        }
+        .advertisement-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .advertisement-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .advertisement-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="notification-container">
+                    <h1 class="display-4"><i class="fas fa-bell"></i> Notification</h1>
+                    <h2>{{ title }}</h2> 
+                    <p class="lead">{{ message }}</p>
+                    {% if advertisement_image %}
+                    <div class="advertisement-container">
+                        <img src="{% static advertisement_image.url %}" alt="Advertisement" class="advertisement-image">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        &copy; Money Term 2024 Company, Inc.
+    </div>
+</body>
+</html>

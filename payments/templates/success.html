@@ -1,0 +1,80 @@
+<!-- payments\templates\success.html -->
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}
+    <title>Payment Successful</title>
+{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="alert alert-success" role="alert">
+      <h2 class="alert-heading">Payment Successful <i class="fas fa-check-circle text-success"></i></h2> <!-- เปลี่ยนไอคอนเป็น Font Awesome -->
+      {% if latest_order %}
+      <strong><p><i class="far fa-file-alt"></i> Order ID: {{ latest_order.id }}</p></strong> <!-- เปลี่ยนไอคอนเป็น Font Awesome -->
+      <strong><p><i class="fas fa-coins"></i> Total Price: {{ latest_order.total_price|intcomma }} THB</p></strong> <!-- เปลี่ยนไอคอนเป็น Font Awesome -->
+      {% endif %}
+    </div>
+    {% if latest_order_items %}
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Order Items <i class="fas fa-shopping-cart"></i></h2> <!-- เปลี่ยนไอคอนเป็น Font Awesome -->
+        <ul class="list-group">
+          {% for item in latest_order_items %}
+          <li class="list-group-item">
+            <strong><i class="fas fa-user"></i> Name:</strong> {{ item.card }}<br>
+            <strong><i class="fas fa-money-bill-wave"></i> Price:</strong> {{ item.price|intcomma }} THB<br> <!-- เปลี่ยนไอคอนเป็น Font Awesome -->
+            <strong><i class="fas fa-hashtag"></i> Serial Number:</strong> <span id="serial_number_{{ item.id }}">{{ item.serial_number }}</span>
+            <button class="copy-button" onclick="copyText('serial_number_{{ item.id }}')"><i class="far fa-copy"></i></button><br> <!-- เปลี่ยนไอคอนเป็น Font Awesome -->
+            <strong><i class="fas fa-key"></i> PIN:</strong> <span id="pin_{{ item.id }}">{{ item.pin }}</span>
+            <button class="copy-button" onclick="copyText('pin_{{ item.id }}')"><i class="far fa-copy"></i></button>
+        </li>
+        
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+    <a href="{% url 'products' %}" class="btn btn-primary mt-3"><i class="fas fa-arrow-left"></i> Back to Products</a> <!-- เปลี่ยนไอคอนเป็น Font Awesome -->
+    {% if latest_order %}
+    <a href="{% url 'feedback_form' %}?order_id={{ latest_order.id }}" class="btn btn-success mt-3"><i class="far fa-comments"></i> Leave Feedback</a> <!-- เปลี่ยนไอคอนเป็น Font Awesome -->
+    {% endif %}
+  </div>
+</section>
+
+<!-- Add Material Icons CDN -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<style>
+  .copy-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    font-size: 16px;
+    color: #1976d2; /* Adjust color as needed */
+  }
+
+  .copy-button:hover {
+    color: #0d47a1; /* Adjust hover color as needed */
+  }
+
+  .copy-button .material-icons {
+    margin-right: 5px;
+    font-size: 18px;
+  }
+</style>
+
+<script>
+  function copyText(elementId) {
+    var text = document.getElementById(elementId).innerText;
+    var input = document.createElement('textarea');
+    input.innerHTML = text;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    alert("Copied to clipboard: " + text);
+  }
+</script>
+{% endblock %}

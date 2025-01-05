@@ -1,0 +1,24 @@
+/* product_app\static\css\about\styles.css */
+
+.container {
+  margin-top: 50px;
+}
+
+.mb-4 {
+  margin-bottom: 2rem !important;
+}
+
+.lead {
+  font-size: 1.25rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .lead {
+      font-size: 1rem;
+  }
+  
+  .container {
+      margin-top: 20px;
+  }
+}

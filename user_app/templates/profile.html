@@ -1,0 +1,63 @@
+<!--user_app\templates\profile.html-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  <title>Profile</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/profile/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  {% if messages %}
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="profile-header text-center mb-4">
+        <h1><i class="fas fa-user-circle"></i> Profile</h1>
+      </div>
+      <div class="profile-container border rounded p-4 bg-light shadow-sm">
+        <div class="row">
+          <div class="col-md-4 text-center">
+            {% if profile.profile_image %}
+              <img src="{{ profile.profile_image.url }}" alt="{{ user.get_full_name }}'s profile image" class="profile-image mb-3">
+            {% else %}
+              <div class="default-profile-image mb-3">
+                <i class="fas fa-user-circle" style="font-size: 6rem; color:black;"></i>
+              </div>
+            {% endif %}
+            
+            <p class="text-muted">@{{ user.username }}</p>
+          </div>
+          <div class="col-md-8">
+            <div class="profile-details mb-3">
+              <p><strong><i class="fas fa-user"></i> Full Name:</strong> {{ user.get_short_name }} ***</p>
+              <p><strong><i class="fas fa-file-alt"></i> Bio:</strong> {{ profile.bio }}</p>
+              <p><strong><i class="fas fa-envelope"></i> Email:</strong> {{ user.email|slice:":3" }}***@***.com</p>
+              <p><strong><i class="fas fa-phone"></i> Phone Number:</strong> ***{{ profile.phone_number|slice:"-3:" }}</p>
+              <p><strong><i class="fas fa-calendar-alt"></i> Date of Birth:</strong> ***{{ profile.date_of_birth|date:" Y" }}</p>
+            </div>
+            <div class="profile-actions d-flex">
+              <a href="{% url 'edit_profile' %}" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> Edit Profile</a>
+              <a href="{% url 'change_password' %}" class="btn btn-secondary"><i class="fas fa-lock"></i> Change Password</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

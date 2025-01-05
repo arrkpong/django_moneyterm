@@ -1,0 +1,71 @@
+<!-- Products_App/product_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+  <title>Product detail - {{ card_type.card_name }}</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/product_detail/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 d-flex justify-content-center align-items-center">
+  <div class="row">
+    <div class="col-md-6">
+      <h1>
+        <i class="fas fa-id-card text-dark"></i> {{ card_type.card_name }}
+      </h1>
+      {% if card_type.image %}
+        <img src="{{ card_type.image.url }}" class="img-fluid" alt="{{ card_type.card_name }}">
+      {% else %}
+        <div class="img-placeholder">
+          <p>No Image Available</p>
+        </div>
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <h1>
+        <i class="fas fa-info-circle text-dark"></i> Description
+      </h1>
+      <p>{{ card_type.description }}</p>
+      <h3>
+        <i class="fas fa-dollar-sign"></i> Price of card
+      </h3>
+      <div class="row">
+        {% for price_count in counts_card_type %}
+          {% if price_count.price %}
+            <div class="col-md-6 mb-1 my-2">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Price: {{ price_count.price|intcomma }} THB</h5>
+                  {% if price_count.count == 0 %}
+                    <p class="card-text">Out of stock</p>
+                    <button type="submit" class="btn btn-danger" disabled><i class="fas fa-exclamation-triangle"></i> Out of stock</button>
+                  {% else %}
+                    <p class="card-text">Remaining amount: {{ price_count.count }} prepaid card</p>
+                    {% if user.is_authenticated %}
+                      <form method="post" action="{% url 'add_to_cart' card_type.pk %}">
+                          {% csrf_token %}
+                          <input type="hidden" name="price" value="{{ price_count.price }}">
+                          <button type="submit" class="btn btn-primary"><i class="fas fa-cart-plus"></i> Add to cart</button>
+                        </form>
+                    {% else %}
+                      <a href="{% url 'login' %}" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Add to cart</a>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <p>No active cards available.</p>
+          {% endif %}
+        {% endfor %}
+          
+      </div>
+    </div>  
+  </div>
+</div>
+{% endblock %}

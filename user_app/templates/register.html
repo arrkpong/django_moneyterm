@@ -1,0 +1,70 @@
+<!--user_app\templates\register.html-->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>Register</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/register/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <h1 class="text-center">
+        <i class="fas fa-user-plus"></i> Register
+      </h1>
+
+      {% if messages %}
+      <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username"><i class="fas fa-user"></i> Username:</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username (5-20 characters)" {% if not success %}value="{{ request.POST.username }}"{% endif %} required>
+          </div>
+          <div class="form-group">
+            <label for="password"><i class="fas fa-lock"></i> Password:</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password (8-20 characters)" required>
+          </div>
+          <div class="form-group">
+            <label for="confirm_password"><i class="fas fa-lock"></i> Confirm Password:</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+          </div>
+          <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Email:</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" {% if not success %}value="{{ request.POST.email }}"{% endif %} required>
+          </div>
+          <div class="form-group">
+            <label for="firstname"><i class="fas fa-user"></i> First Name:</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Enter your first name" {% if not success %}value="{{ request.POST.firstname }}"{% endif %} required>
+          </div>
+          <div class="form-group">
+            <label for="lastname"><i class="fas fa-user"></i> Last Name:</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Enter your last name" {% if not success %}value="{{ request.POST.lastname }}"{% endif %} required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="phone"><i class="fas fa-phone"></i> Phone:</label>
+          <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" {% if not success %}value="{{ request.POST.phone }}"{% endif %} required>
+        </div>
+        <div class="form-group">
+          <label for="date_of_birth"><i class="fas fa-calendar-alt"></i> Date of Birth DD/MM/YYYY:</label>
+          <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" placeholder="Enter your date of birth 31/12/1999" {% if not success %}value="{{ request.POST.date_of_birth }}"{% endif %} required>
+        </div>
+        <button type="submit" class="btn btn-primary my-1"><i class="fas fa-user-plus"></i> Register</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

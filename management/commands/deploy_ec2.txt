@@ -1,0 +1,324 @@
+###deploy_ec2.md
+----------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------Add Django Project To Github-------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------
+echo "# django_moneyterm" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/arrkpong/django_moneyterm.git
+if error: remote origin already exists
+git remote set-url origin https://github.com/arrkpong/django_moneyterm.git
+git push -u origin main
+----------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------Deploy Django Project To AWS EC2---------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------
+#ขั้นตอนที่ 1: สร้างและตั้งค่า EC2 Instance
+-ล็อกอินเข้า AWS Management Console และไปที่ EC2 Dashboard
+-คลิก "Launch Instance" แล้วเลือก Amazon Machine Image (AMI) ที่ต้องการ (เช่น Amazon Linux 2, Ubuntu)
+-เลือกประเภทของ instance (เช่น t2.micro สำหรับการใช้งานฟรี)
+-ตั้งค่า Instance details, Storage และ Tag ตามต้องการ
+-ในส่วน Security Group ให้เปิด port ที่จำเป็น (เช่น 22 สำหรับ SSH, 80 สำหรับ HTTP, 443 สำหรับ HTTPS)
+-Review and Launch instance แล้วดาวน์โหลดไฟล์ key pair (.pem)
+ 
+#เชื่อมต่อไปยัง EC2 Instance
+#ใช้ SSH เพื่อเชื่อมต่อไปยัง instance ของคุณ
+ssh -i AWS_EC2_Linux.pem ec2-user@00.00.00.00
+
+#ขั้นตอนที่ 2: ติดตั้ง Dependencies บน EC2
+sudo yum update -y
+sudo yum install python3 -y
+sudo yum install python3-pip -y
+#ติดตั้ง sqlite ถ้าใช้
+sudo yum install sqlite-devel
+#ติดตั้ง postgresql ถ้าใช้
+sudo yum install postgresql-devel
+#ติดตั้ง Git:
+sudo yum install git -y
+#ติดตั้ง virtualenv:
+sudo pip3 install virtualenv
+
+pip install django
+pip install pymemcache
+pip install stripe
+pip install Pillow
+#ขั้นตอนที่ 3: ดึงโค้ดจาก GitHub
+git clone https://arrkpong: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@github.com/arrkpong/django_moneyterm.git
+cd django_moneyterm
+pwd
+
+#สร้างและเปิดใช้งาน virtual environment:
+virtualenv venv
+source venv/bin/activate
+#pip install -r requirements.txt
+
+#ขั้นตอนที่ 5: ตั้งค่า Gunicorn และ Nginx
+#ติดตั้ง Gunicorn:
+#Gunicorn ซึ่งเป็น WSGI (Web Server Gateway Interface) HTTP server สำหรับโปรเจกต์ Python โดยเฉพาะสำหรับการ deploy แอปพลิเคชัน Django หรือ Flask 
+#อย่างไรก็ตาม Gunicorn ไม่ใช่เซิร์ฟเวอร์ HTTP ตัวเอง แต่มันเป็นตัวกลางระหว่างเซิร์ฟเวอร์ HTTP และโปรแกรม Python ที่เขียนขึ้นมาเพื่อใช้งานกับโปรแกรม Python ที่ใช้ WSGI
+pip install gunicorn
+#รัน Gunicorn เพื่อทดสอบ:
+gunicorn --bind 127.0.0.1:8000 project.wsgi
+
+
+#ติดตั้งและตั้งค่า Nginx:
+#ดาวน์โหลดและติดตั้ง Nginx เซิร์ฟเวอร์เว็บในระบบปฏิบัติการ Linux ในระบบปฏิบัติการที่ใช้พื้นฐานของ Red Hat เช่น CentOS หรือ Amazon Linux (ที่ใช้ในที่นี้)
+#ติดตั้ง Nginx:
+sudo yum install nginx -y
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl status nginx
+sudo nano /etc/nginx/nginx.conf
+#ถ้าเกิดข้อผิดพลาด "Permission denied" แสดงว่า Nginx ไม่มีสิทธิ์เข้าถึงไฟล์ที่อยู่ในไดเรกทอรีที่เก็บไฟล์สถิติและสื่อของคุณ
+#คำสั่งนี้จะเปลี่ยนเจ้าของของไดเร็กทอรี staticfiles และทุกไฟล์และไดเร็กทอรีภายในเป็น nginx และกลุ่มของมันเป็น nginx ซึ่งจะช่วยให้เซิร์ฟเวอร์ Nginx สามารถอ่านและเขียนไฟล์ในไดเร็กทอรีนี้ได้
+sudo chown -R nginx:nginx /home/ec2-user/django_moneyterm/staticfiles/ 
+#คำสั่งนี้จะกำหนดสิทธิ์ให้ไดเร็กทอรี staticfiles และทุกไฟล์และไดเร็กทอรีภายในโดยที่ผู้ใช้ทั้งหมดสามารถอ่านและเขียนไฟล์ได้ และผู้ใช้ในกลุ่มและผู้ใช้ทั่วไปอื่น ๆ สามารถอ่านไฟล์ได้ แต่ไม่สามารถเขียนไฟล์ได้
+sudo chmod -R 755 /home/ec2-user/django_moneyterm/staticfiles/
+sudo chown -R nginx:nginx /home/ec2-user/django_moneyterm/media/
+sudo chmod -R 755 /home/ec2-user/django_moneyterm/media/
+nano project/settings.py
+--------------------------------------------------/etc/nginx/nginx.conf-------------------------------------------------------------
+#   * Official English Documentation: http://nginx.org/en/docs/
+#   * Official Russian Documentation: http://nginx.org/ru/docs/
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+    access_log /var/log/nginx/access.log main;
+
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    #server unix:/home/ec2-user/django_moneyterm/project.sock;
+    include /etc/nginx/conf.d/*.conf;
+    upstream django {
+        server 127.0.0.1:8000;  # Assuming Gunicorn is running on localhost:8000
+    }
+
+    server {
+        listen 80;
+        server_name 13.115.12.144;  # Replace this with your domain or public IP
+
+        location / {
+            proxy_pass http://django;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        # เพิ่มส่วนนี้เพื่อรับ Webhooks จาก Stripe
+        location /stripe/webhook/ {
+            proxy_pass http://django;  # ตั้งค่าให้เชื่อมต่อกับแอปพลิเคชัน Django ที่ Gunicorn
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /static/ {
+            alias /home/ec2-user/django_moneyterm/staticfiles/;
+        }
+
+        location /media/ {
+            alias /home/ec2-user/django_moneyterm/media/;
+        }
+        location /media/advertisement_images/ {
+            alias /home/ec2-user/django_moneyterm/media/advertisement_images/;
+        }
+
+        location /media/card_images/ {
+            alias /home/ec2-user/django_moneyterm/media/card_images/;
+        }
+
+        location /media/profile_images/ {
+            alias /home/ec2-user/django_moneyterm/media/profile_images/;
+        }
+
+        location /media/ticket_images/ {
+            alias /home/ec2-user/django_moneyterm/media/ticket_images/;
+        }
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        error_page 404 /404.html;
+        location = /404.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+        }
+    }
+}
+
+# Settings for a TLS enabled server.
+#
+#    server {
+#        listen       443 ssl http2;
+#        listen       [::]:443 ssl http2;
+#        server_name  _;
+#        root         /usr/share/nginx/html;
+#
+#        ssl_certificate "/etc/pki/nginx/server.crt";
+#        ssl_certificate_key "/etc/pki/nginx/private/server.key";
+#        ssl_session_cache shared:SSL:1m;
+#        ssl_session_timeout  10m;
+#        ssl_ciphers PROFILE=SYSTEM;
+#        ssl_prefer_server_ciphers on;
+#
+#
+#        # Load configuration files for the default server block.
+#        include /etc/nginx/default.d/*.conf;
+#
+#        error_page 404 /404.html;
+#        location = /404.html {
+#        }
+#
+#        error_page 500 502 503 504 /50x.html;
+#        location = /50x.html {
+#        }
+#    }
+
+
+#กด Ctrl + O เพื่อบันทึกไฟล์
+#กด Enter เพื่อยืนยันชื่อไฟล์ที่เป็นไปตามค่า default
+#กด Ctrl + X เพื่อออกจากโหมดแก้ไขของ nano
+#ตรวจสอบคอนฟิก Nginx เพื่อความถูกต้อง:
+sudo nginx -t
+#รีสตาร์ท Nginx:
+sudo systemctl restart nginx
+#ตั้งค่า Gunicorn เป็น Service:
+sudo nano /etc/systemd/system/gunicorn.service
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=ec2-user
+Group=nginx
+WorkingDirectory=/home/ec2-user/django_moneyterm
+ExecStart=/home/ec2-user/django_moneyterm/venv/bin/gunicorn --workers 3 --bind unix:/home/ec2-user/django_moneyterm/project.sock project.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+#กด Ctrl + O เพื่อบันทึกไฟล์
+#กด Enter เพื่อยืนยันชื่อไฟล์ที่เป็นไปตามค่า default
+#กด Ctrl + X เพื่อออกจากโหมดแก้ไขของ nano
+#Reload systemd:
+sudo systemctl daemon-reload
+sudo systemctl status gunicorn
+#เริ่ม Gunicorn service ใหม่
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+
+#ดาวน์โหลดและแตกไฟล์ Stripe CLI:
+wget https://github.com/stripe/stripe-cli/releases/download/v1.19.5/stripe_1.19.5_linux_x86_64.tar.gz
+tar -xvf stripe_1.19.5_linux_x86_64.tar.gz
+#เปลี่ยนชื่อไฟล์และย้ายไฟล์ไปยังโฟลเดอร์ bin:
+sudo mv stripe /usr/local/bin/
+#ตรวจสอบการติดตั้ง
+stripe version
+
+#ตรวจสอบบันทึกเซิร์ฟเวอร์เพื่อหาข้อมูลเพิ่มเติมเกี่ยวกับข้อผิดพลาด!
+#เปิดหรือเข้าสู่ไดเร็กทอรี /var/log/nginx/ โดยใช้คำสั่ง 
+cd /var/log/nginx/
+#ดังนั้นเรามีไฟล์ error.log และ access.log ที่คุณสามารถเปิดและตรวจสอบได้:
+#ใช้คำสั่งเพื่อแสดงเนื้อหาในไฟล์ error.log
+cat error.log
+#ใช้คำสั่งเพื่อแสดงเนื้อหาในไฟล์ access.log
+cat access.log
+
+cd /home/ec2-user/django_moneyterm
+
+#ตรวจสอบเจ้าของและสิทธิ์: ตรวจสอบว่าเซิร์ฟเวอร์ Nginx มีสิทธิ์เขียนไฟล์และอ่านไดเรกทอรีเหล่านี้หรือไม่ คุณสามารถใช้คำสั่ง ls -l เพื่อดูเจ้าของและสิทธิ์ปัจจุบันของไฟล์และไดเรกทอรี:
+ls -l
+ls -l /home/ec2-user/django_moneyterm/media/
+ls -l /home/ec2-user/django_moneyterm/staticfiles/
+
+#ตรวจสอบว่าเจ้าของของไฟล์และไดเร็กทอรีเป็นใครและสิทธิ์ที่กำหนดสำหรับเจ้าของ ถ้าไม่ใช่ nginx คุณสามารถเปลี่ยนเจ้าของเป็น nginx โดยใช้คำสั่ง:
+sudo chown -R nginx:nginx /home/ec2-user/django_moneyterm/media/
+sudo chown -R nginx:nginx /home/ec2-user/django_moneyterm/staticfiles/
+
+#ตรวจสอบสิทธิ์: ตรวจสอบว่าไดเรกทอรีและไฟล์มีสิทธิ์ที่เหมาะสมสำหรับ Nginx ในการอ่านไฟล์ สิทธิ์ควรอยู่ที่ 755 สำหรับไดเรกทอรีและ 644 สำหรับไฟล์:
+sudo chmod -R 755 /home/ec2-user/django_moneyterm/media/
+sudo chmod -R 755 /home/ec2-user/django_moneyterm/staticfiles/
+
+sudo chmod -R 775 /home/ec2-user/django_moneyterm/media/
+sudo chmod -R 775 /home/ec2-user/django_moneyterm/staticfiles/
+
+sudo chmod -R 777 /home/ec2-user/django_moneyterm/media/
+sudo chmod -R 777 /home/ec2-user/django_moneyterm/staticfiles/
+#รีสตาร์ท Nginx: หลังจากที่คุณทำการเปลี่ยนแปลงสิทธิ์และเจ้าของ รีสตาร์ทเซิร์ฟเวอร์ Nginx เพื่อให้การเปลี่ยนแปลงมีผล:
+sudo systemctl restart nginx
+#ทดสอบการเข้าถึงได้ว่า Nginx สามารถอ่านและเขียนข้อมูลในไดเร็กทอรี media ได้หรือไม่
+sudo touch /home/ec2-user/django_moneyterm/media/test.txt
+
+#ตรวจสอบบันทึก: หลังจากนั้น ตรวจสอบบันทึกข้อผิดพลาดของ Nginx อีกครั้งเพื่อดูว่าปัญหาได้รับการแก้ไขหรือไม่:
+sudo tail -f /var/log/nginx/error.log
+
+#การตรวจสอบการกำหนดที่อยู่ให้แก่ไฟล์และไดเร็กทอรี: ตรวจสอบให้แน่ใจว่าไดเรกทอรีและไฟล์ที่ Nginx พยายามเข้าถึงมีที่อยู่ถูกต้องในคอนฟิกของ Nginx:
+location /media/ {
+    alias /home/ec2-user/django_moneyterm/media/;
+}
+
+location /static/ {
+    alias /home/ec2-user/django_moneyterm/staticfiles/;
+}
+
+#รัน Gunicorn เพื่อทดสอบ:
+gunicorn --bind 127.0.0.1:8000 project.wsgi
+#กรณีที่ต้องการรัน Gunicorn ในโหมดเบื้องหลัง (background mode) สามารถใช้คำสั่งดังนี้:
+gunicorn --bind 127.0.0.1:8000 project.wsgi --daemon
+#คำสั่งที่ใช้ในการรีสตาร์ท Gunicorn
+systemctl restart gunicorn
+#Reload systemd:
+sudo systemctl daemon-reload
+sudo systemctl status gunicorn
+#เริ่ม Gunicorn service ใหม่
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+sudo systemctl stop gunicorn
+#วิธีป้องกันไม่ให้เซิร์ฟเวอร์หยุดทำงานเมื่อคุณออกจากเซสชัน:
+#เพื่อให้เซิร์ฟเวอร์ Gunicorn ยังคงทำงานต่อไปหลังจากที่คุณออกจากเซสชัน คุณสามารถใช้ตัวเลือกหรือวิธีการต่อไปนี้:
+
+#ใช้ตัวเลือก --daemon:
+#รัน Gunicorn ในโหมด daemon ซึ่งจะรันเซิร์ฟเวอร์ในเบื้องหลัง
+gunicorn --workers 3 --daemon project.wsgi:application
+#ใช้ nohup:
+#รันคำสั่ง Gunicorn พร้อมกับ nohup เพื่อให้คำสั่งยังคงทำงานต่อไปแม้ว่าคุณจะออกจากเซสชัน
+nohup gunicorn --workers 3 project.wsgi:application &
+#สัญลักษณ์ & ที่ท้ายคำสั่งจะทำให้คำสั่งรันในพื้นหลัง
+
+#ใช้ screen หรือ tmux:
+#สร้างเซสชันเทอร์มินัลแยกต่างหากโดยใช้ screen หรือ tmux ซึ่งช่วยให้คุณสามารถออกจากเซสชันนั้นได้โดยที่กระบวนการยังคงทำงานต่อไป
+#สำหรับ screen:
+screen -S project
+gunicorn --workers 3 project.wsgi:application
+#จากนั้นกด Ctrl + A ตามด้วย D เพื่อออกจากเซสชัน screen โดยที่กระบวนการยังคงทำงานต่อ
+#สำหรับ tmux:
+tmux new -s project
+gunicorn --workers 3 project.wsgi:application
+#จากนั้นกด Ctrl + B ตามด้วย D เพื่อออกจากเซสชัน tmux โดยที่กระบวนการยังคงทำงานต่อ
+

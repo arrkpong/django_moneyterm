@@ -1,0 +1,71 @@
+<!-- cart_app/templates/cart_view.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+  <title>Cart</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/cart_view/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+  <h1><i class="fas fa-shopping-cart"></i> Cart</h1>
+  
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if cart_items %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Card Type</th>
+          <th scope="col">Price</th>
+          <th scope="col">Amount</th>
+          <th scope="col">Image</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+          <tr>
+            <td data-label="#"> {{ forloop.counter }}</td>
+            <td data-label="Card Type">{{ item.card.card_price.card_name }}</td>
+            <td data-label="Price">{{ item.card.price|intcomma }} THB</td>
+            <td data-label="Amount">{{ item.amount }}</td>
+            <td data-label="Image"><img src="{{ item.card.card_price.image.url }}" alt="{{ item.card.card_price.card_name }}" style="max-width: 40px;"></td>
+            <td data-label="Actions">
+              <form action="{% url 'remove_from_cart' cart_item_id=item.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Remove</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h3>Total Price: {{ total_price|intcomma }} THB</h3>
+    <a href="{% url 'clear_cart' %}" class="btn btn-warning"><i class="fas fa-trash"></i> Clear Cart</a>
+    <a class="btn btn-success" id="submitBtn"><i class="fas fa-credit-card"></i> Proceed to Payment</a>
+    <div class="alert alert-warning mt-3" role="alert">
+      <i class="fas fa-exclamation-triangle"></i> Please complete your payment within 1 hour, otherwise your session will expire.
+    </div>
+  {% else %}
+    <p class="text-info mt-4">
+        <i class="fas fa-info-circle"></i> Your cart is empty.
+    </p>
+  {% endif %}
+</div>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="{% static 'js/stripe.js' %}"></script>
+{% endblock %}
+

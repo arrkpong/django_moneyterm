@@ -1,0 +1,75 @@
+<!-- Users_App/edit_profile.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  <title>Edit Profile</title>
+{% endblock %}
+
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/edit_profile/style.css' %}">
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    {% if messages %}
+      <div class="row">
+        <div class="col-md-12">
+          {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="row">
+      <div class="col-md-8 user-profile">
+        <h2><i class="fas fa-pencil-square"></i> Edit Profile</h2>
+        <form method="POST" enctype="multipart/form-data" class="edit-profile-form">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="bio"><i class="fas fa-file-alt"></i> Bio:</label>
+            <textarea class="form-control" id="bio" name="bio">{{ profile.bio }}</textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="profile_image"><i class="fas fa-image"></i> Profile Image:</label>
+            <input type="file" class="form-control-file" id="profile_image" name="profile_image" accept="image/*">
+          </div>        
+          
+          <div class="form-group">
+            <label for="first_name"><i class="fas fa-user"></i> First Name:</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+          </div>
+
+          <div class="form-group">
+            <label for="last_name"><i class="fas fa-user"></i> Last Name:</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+          </div>
+
+          <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Email:</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+          </div>
+
+          <div class="form-group">
+            <label for="phone_number"><i class="fas fa-phone"></i> Phone Number:</label>
+            <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ profile.phone_number }}">
+          </div>
+
+          <div class="form-group">
+            <label for="date_of_birth"><i class="fas fa-calendar-alt"></i> Date of Birth DD/MM/YYYY:</label>
+            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ profile.date_of_birth }}">
+          </div>
+
+          <button type="submit" class="btn btn-primary mt-3"><i class="fas fa-save"></i> Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
